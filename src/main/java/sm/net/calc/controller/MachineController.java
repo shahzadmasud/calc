@@ -7,9 +7,15 @@ package sm.net.calc.controller;
 
 import io.swagger.annotations.ApiOperation;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import javax.persistence.RollbackException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,16 +42,14 @@ public class MachineController {
 
     @PostMapping("/machine/create")
     @ApiOperation(value = "This API would help in creating a new Machine", response = Machine.class)
+    @Transactional(rollbackFor = RollbackException.class)
     public Machine create(
-            @RequestParam(value = "name", required = true) String name,
+            @RequestParam(value = "name", required = true, defaultValue = "OK") String name,
             @RequestParam(value = "include_sql_ent", required = false) Boolean include,
             @RequestParam(value = "no_vcpus", required = false) Integer vCPUs,
             @RequestParam(value = "ram", required = false) Integer ram,
             @RequestParam(value = "temp_storage", required = false) Integer tempStorage,
             @RequestParam(value = "harddisk", required = false) Integer harddisk) {
-        if (name.trim().length() == 0) {
-            return new Machine("Provide Machine name ... ");
-        }
         Machine g = new Machine(name);
         g.setIncludeSQLEnt(include);
         g.setNoOfVCPUs(vCPUs);
@@ -53,7 +57,8 @@ public class MachineController {
         g.setTempStorage(tempStorage);
         g.setHardDiskSSD(harddisk);
 
-        return machineRepository.save(g);
+            return machineRepository.save(g);
+
     }
 
     @PostMapping("/machine/update")
@@ -122,7 +127,7 @@ public class MachineController {
             Optional<Machine> c = machineRepository.findById(Long.parseLong(machineId));
             if (c.isPresent()) {
                 machineRepository.deleteById(Long.parseLong(machineId));
-                return c.get() ;
+                return c.get();
             }
         }
         return new Machine(machineId + " doesn't exists ... ");

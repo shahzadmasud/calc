@@ -13,12 +13,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  *
  * @author shahzadmasud
  */
 @Entity
+@ConfigurationProperties
 public class Market implements Serializable {
 
     @Id
@@ -28,31 +32,37 @@ public class Market implements Serializable {
 
     @JsonIgnore
     @ManyToOne
+    @NotNull
     @JoinColumn(name = "markettype_primary")
     private MarketType primary;
     @JsonIgnore
     @ManyToOne
+    @NotNull
     @JoinColumn(name = "markettype_secondary")
     private MarketType secondary;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "component_id")
     private Machine component;
+    @Range (min = 1, message = "Number of component servers should be greater than zero")
     private Long countComponnt;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "appserver_id")
     private Machine appServer;
+    @Range (min = 1, message = "Number of app servers should be greater than zero")
     private Long countAppServer;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "webserver_id")
     private Machine webServer;
+    @Range (min = 1, message = "Number of web servers should be greater than zero")
     private Long countWebServer;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "dbserver_id")
     private Machine dbServer;
+    @Range (min = 1, message = "Number of db servers should be greater than zero")
     private Long countDbServer;
 
     public Market(String name) {

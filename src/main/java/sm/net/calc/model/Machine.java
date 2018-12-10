@@ -10,13 +10,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.http.HttpStatus;
 
 /**
  *
  * @author shahzadmasud
  */
 @Entity
-public class Machine implements Serializable {
+@ConfigurationProperties
+public class Machine extends Base implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,9 +28,13 @@ public class Machine implements Serializable {
 
     private String name;
     private Boolean includeSQLEnt;
+    @Range(min = 1, message = "Number of CPUs should be greater than zero")
     private Integer noOfVCPUs;
+    @Range(min = 1, message = "RAM should be greater than zero")
     private Integer ram;
+    @Range(min = 1, message = "Temp Storage should be greater than zero")
     private Integer tempStorage;
+    @Range(min = 1, message = "Disk size should be greater than zero")
     private Integer hardDiskSSD;
 
     public Machine() {
@@ -34,6 +42,11 @@ public class Machine implements Serializable {
 
     public Machine(String name) {
         this.name = name;
+    }
+
+    public Machine(String message, HttpStatus status) {
+        this.status = status;
+        this.message = message;
     }
 
     public Long getId() {
